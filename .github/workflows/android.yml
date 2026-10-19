@@ -1,49 +1,49 @@
 name: Build Shadow APK
 
 'on':
-workflow_dispatch:
-push:
-branches:
-- main
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  - name: Set up Node.js
-    uses: actions/setup-node@v4
-    with:
-      node-version: '20'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-  - name: Set up Java
-    uses: actions/setup-java@v5
-    with:
-      distribution: temurin
-      java-version: '17'
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
 
-  - name: Extract project
-    run: unzip shadow_reviewed.zip -d extracted
+      - name: Extract project
+        run: unzip shadow_reviewed.zip -d extracted
 
-  - name: Install dependencies and create Android project
-    working-directory: extracted/shadow
-    run: |
-      npm install
-      npm --prefix frontend install
-      npm --prefix frontend run cap:add
+      - name: Install dependencies and create Android project
+        working-directory: extracted/shadow
+        run: |
+          npm install
+          npm --prefix frontend install
+          npm --prefix frontend run cap:add
 
-  - name: Build debug APK
-    working-directory: extracted/shadow
-    env:
-      SHADOW_API_URL: "http://78.154.103.48:11902"
-    run: npm run apk
+      - name: Build debug APK
+        working-directory: extracted/shadow
+        env:
+          SHADOW_API_URL: "http://78.154.103.48:11902"
+        run: npm run apk
 
-  - name: Upload APK
-    uses: actions/upload-artifact@v4
-    with:
-      name: shadow-debug-apk
-      path: extracted/shadow/frontend/android/app/build/outputs/apk/debug/app-debug.apk
-      if-no-files-found: error
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: shadow-debug-apk
+          path: extracted/shadow/frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
