@@ -1,1 +1,15 @@
+name: Build Shadow APK
 
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          unzip shadow_reviewed.zip -d extracted
+          find extracted -name package.json -print
