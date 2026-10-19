@@ -1,3 +1,4 @@
+
 name: Build Shadow APK
 
 'on':
@@ -25,8 +26,17 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Verify ZIP file
+        run: |
+          ls -lah
+          test -f shadow_upgraded.zip
+
       - name: Extract project
-        run: unzip shadow_reviewed.zip -d extracted
+        run: |
+          mkdir -p extracted
+          unzip -o shadow_upgraded.zip -d extracted
+          ls -lah extracted
+          test -f extracted/shadow/package.json
 
       - name: Install dependencies and create Android project
         working-directory: extracted/shadow
@@ -38,7 +48,7 @@ jobs:
       - name: Build debug APK
         working-directory: extracted/shadow
         env:
-          SHADOW_API_URL: "https://shadowchat.wispbyte.app"
+          SHADOW_API_URL: "https://shadowchat1.wispbyte.app"
         run: npm run apk
 
       - name: Upload APK
@@ -47,3 +57,4 @@ jobs:
           name: shadow-debug-apk
           path: extracted/shadow/frontend/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          
