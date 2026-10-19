@@ -1,5 +1,5 @@
 
-name: Build Shadow APK
+name: Prepare Shadow Android
 
 'on':
   workflow_dispatch:
@@ -8,13 +8,21 @@ name: Build Shadow APK
       - main
 
 jobs:
-  check:
+  inspect:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP
+      - name: Extract project
+        run: unzip shadow_reviewed.zip -d extracted
+
+      - name: Inspect Android configuration
         run: |
-          unzip shadow_reviewed.zip -d extracted
-          find extracted -name package.json -print
+          cd extracted/shadow
+          echo "=== Root package.json ==="
+          cat package.json
+          echo "=== Frontend package.json ==="
+          cat frontend/package.json
+          echo "=== Capacitor config ==="
+          cat frontend/capacitor.config.json
           
