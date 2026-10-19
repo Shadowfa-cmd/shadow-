@@ -1,28 +1,48 @@
 
-name: Prepare Shadow Android
+name: Build Shadow APK
 
 'on':
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  inspect:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
       - name: Extract project
         run: unzip shadow_reviewed.zip -d extracted
 
-      - name: Inspect Android configuration
+      - name: Install dependencies and create Android project
+        working-directory: extracted/shadow
         run: |
-          cd extracted/shadow
-          echo "=== Root package.json ==="
-          cat package.json
-          echo "=== Frontend package.json ==="
-          cat frontend/package.json
-          echo "=== Capacitor config ==="
-          cat frontend/capacitor.config.json
+          npm install
+          npm --prefix frontend install
+          npm --prefix frontend run cap:add
+
+      - name: Build debug APK
+        working-directory: extracted/shadow
+        run: npm run apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: shadow-debug-apk
+          path: extracted/shadow/frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
           
